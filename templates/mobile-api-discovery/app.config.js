@@ -19,7 +19,7 @@ const os = require('os');
  * plain PORT), Metro is started from that same environment — so reading it
  * here is a fact rather than a guess.
  *
- * CHANGE FOR YOUR PROJECT: the env var name and the default below.
+ * CHANGE FOR YOUR PROJECT: the env var names and the default below.
  *
  * ## Why the LAN IP is baked
  *
@@ -32,12 +32,23 @@ const os = require('os');
  */
 
 /** Port the API listens on, from the environment that launched Metro. */
-const PORT_ENV_VAR = 'PCP_PORT_BASE'; // e.g. INKREAD_PORT_BASE, API_PORT
+// List every name your server accepts, MOST canonical first, and mirror the
+// server's own precedence exactly — if the two drift, the app addresses a
+// different server than the one running, which looks like the server is down.
+// (Inkwell resolves INK_PORT_BASE ?? PCP_PORT_BASE ?? 3001; the legacy name is
+// still read for backward compatibility.)
+const PORT_ENV_VARS = ['INK_PORT_BASE', 'PCP_PORT_BASE'];
 const DEFAULT_PORT = 3001; // your project's main dev API port
 
 function apiPort() {
-  const base = Number.parseInt(process.env[PORT_ENV_VAR] ?? '', 10);
-  return Number.isInteger(base) && base > 0 && base < 65536 ? base : DEFAULT_PORT;
+  // An unusable value falls through to the next name rather than being
+  // accepted: `FOO_PORT_BASE=` (empty) is how a shell unsets an inherited var,
+  // and treating that as 0 would be worse than ignoring it.
+  for (const name of PORT_ENV_VARS) {
+    const base = Number.parseInt(process.env[name] ?? '', 10);
+    if (Number.isInteger(base) && base > 0 && base < 65536) return base;
+  }
+  return DEFAULT_PORT;
 }
 
 /**

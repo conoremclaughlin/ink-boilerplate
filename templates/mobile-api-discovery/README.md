@@ -34,7 +34,7 @@ At runtime `resolveApiUrl` picks the first tier that applies:
 
 1. `EXPO_PUBLIC_API_URL` — explicit override always wins.
 2. **The Metro host** — a dev build is already talking to the dev machine, and
-   the API is on it. This is what follows a changing IP with no rebuild. Four
+   the API is on it. This is what follows a changing IP with no rebuild. Five
    Expo fields are tried (`hostUri`, `expoGoConfig.debuggerHost`,
    `manifest.debuggerHost`, `manifest2…debuggerHost`, `linkingUri`) because
    which one is populated varies by runtime, and reading only one lands you on
@@ -45,6 +45,12 @@ At runtime `resolveApiUrl` picks the first tier that applies:
 4. `extra.productionApiUrl` — a real deployment.
 5. Loopback — last resort, and the resolver reports `source` so the UI can
    explain why rather than emitting a generic network error.
+
+Tiers 3 and 4 **swap order with the build**, which is the whole reason `isDev`
+is a parameter. A dev build prefers the LAN address; a release build prefers the
+configured production URL and keeps LAN only as a fallback. Get this wrong and a
+shipped app addresses the laptop that built it, and `productionApiUrl` can never
+take effect no matter what anyone sets.
 
 ## Files → destinations
 
@@ -83,7 +89,10 @@ export const API_URL_HINT = describeApiUrlProblem(resolved, __DEV__);
 
 ## Change for your project
 
-- `PORT_ENV_VAR` and `DEFAULT_PORT` at the top of `app.config.js`.
+- `PORT_ENV_VARS` and `DEFAULT_PORT` at the top of `app.config.js`. List every
+  name your server accepts, **most canonical first, mirroring the server's own
+  precedence** — if the two drift, the app addresses a different server than
+  the one running, which looks exactly like the server being down.
 - Requires `expo-constants` (already a dependency of any Expo app).
 
 ## Verify it, don't assume it
@@ -93,7 +102,8 @@ the file:
 
 ```bash
 npx expo config --type public --json | jq '.extra'          # apiPort + lanHost
-PCP_PORT_BASE=4801 npx expo config --type public --json | jq '.extra.apiPort'
+INK_PORT_BASE=4801 npx expo config --type public --json | jq '.extra.apiPort'
+INK_PORT_BASE= PCP_PORT_BASE=4801 npx expo config --type public --json | jq '.extra.apiPort'
 ```
 
 ## Gotchas learned the hard way
