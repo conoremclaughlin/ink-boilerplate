@@ -10,6 +10,10 @@ Monorepo boilerplate with AI agent conventions and a Next.js starter.
 - **CLAUDE.md / GEMINI.md** — symlinks to AGENTS.md
 - **CONTRIBUTING.md** — git conventions (Angular commits, GitHub flow, no-squash merging, code comments, PR format)
 - **`.ink/`** — [Inkwell](https://github.com/conoremclaughlin/inkwell) integration scaffolding
+- **`templates/`** — drop-in patterns extracted from shipped projects, each with
+  its own README of destinations and hard-won gotchas:
+  - [`supabase-auth`](./templates/supabase-auth) — cookie-session auth + RLS-gated Postgres for a Next.js app
+  - [`mobile-api-discovery`](./templates/mobile-api-discovery) — an Expo app that finds the local API's host *and* port by itself, so a changed LAN IP or a non-default port needs no edit
 
 ## Quick start
 
