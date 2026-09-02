@@ -26,7 +26,10 @@ time, by `app.config.js`, and read at runtime through `expo-constants`:
 
 - **`extra.apiPort`** — from the env var that launches your API. Metro starts
   from that same shell, so this is a fact rather than a guess. Metro's own port
-  (8081) is unrelated to the API's and is deliberately not used.
+  (8081) is unrelated to the API's and is deliberately not used. It applies to
+  the tiers that supply only a **host** (Metro, LAN, loopback);
+  `EXPO_PUBLIC_API_URL` and `productionApiUrl` are full URLs and carry their
+  own ports, which is the point of setting them.
 - **`extra.lanHost`** — this machine's LAN IPv4, preferring `en0`/`en1` so a
   Docker bridge or VPN adapter cannot win.
 
