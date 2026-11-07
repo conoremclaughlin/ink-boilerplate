@@ -43,7 +43,24 @@ Throughout the session, use `update_session_phase` for structural status changes
 
 This is a yarn workspaces monorepo:
 
-- **`packages/web`** — Next.js web application (Next.js 16, React 19, Tailwind v4, TanStack Query)
+- **`packages/web`** — Next.js web application (Next.js 16, React 19, Tailwind v4, shadcn/ui on Base UI, TanStack Query)
+
+## UI Components (required)
+
+UI is built from [shadcn/ui](https://ui.shadcn.com) on [Base UI](https://base-ui.com), with Tailwind CSS v4. Components live in `packages/web/src/components/ui/`, added by the shadcn CLI and owned by this repo.
+
+- **Never hand-build a component the library already has.** Import it: `import { Button } from '@/components/ui/button'`.
+- **Add a missing one with the CLI, from `packages/web`**, rather than copying code from the docs or another project:
+
+  ```bash
+  npx shadcn@latest add <component> --dry-run   # see what it will write
+  npx shadcn@latest add <component>
+  ```
+
+  `components.json` records the setup (style `base-nova`, base colour `neutral`, lucide icons). Commit a generated file before changing it, then make any change in its own commit, so the diff shows it. If the CLI offers to overwrite a file you've changed, say no.
+
+- **Theme in one place.** Colours, radius and fonts are CSS variables in `src/app/globals.css` (light and `.dark`). Use the roles (`bg-primary`, `text-muted-foreground`, `border-border`) rather than raw colours, so a theme change reaches every component.
+- **Start from shadcn's defaults.** Learn from them before departing from them, and when you do depart, make the change in the theme or in the component, not in one page.
 
 ## Architecture
 
